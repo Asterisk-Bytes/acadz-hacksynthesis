@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Button, IconButton, Modal, Portal, Provider, Text, useTheme } from 'react-native-paper';
-import * as ImagePicker from 'expo-image-picker';
-import * as ImageManipulator from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
+import { ActivityIndicator, Button, IconButton, Modal, Portal, Text, useTheme } from 'react-native-paper';
 import axios from 'axios';
+import ImagePickerDialog from '../../components/ImagePickerDialog';
 
 const NOT_LOADING = -1.0;
 
@@ -15,77 +13,16 @@ const ScanDocumentScreen = ({ navigation }) => {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(NOT_LOADING);
 
-    const _getImageSizeInMB = async (imgUri) => {
-        const imageInfo = await FileSystem.getInfoAsync(imgUri);
-        return imageInfo.size / 1024 / 1024;
+    const imagePickerDialog = useRef(null);
+
+    const addImage = () => {
+        imagePickerDialog.current.pickImageAndAdd(images);
+    };
+
+    const replaceImage = (index) => {
+        imagePickerDialog.current.pickImageAndReplace(index, images);
     }
 
-    const _validateImage = async (imgUri) => { // make image under 1mb
-        let finalImgUri = imgUri;
-        let finalImgSize = await _getImageSizeInMB(finalImgUri);
-
-        if (finalImgSize > 1) {
-            const outputQuality = (finalImgSize < 1.5) ? (0.7) : (finalImgSize < 4 ? 0.5 : 0.1);
-            const compressedImage = await _compressImage(finalImgUri, outputQuality);
-
-            finalImgUri = compressedImage.uri;
-            finalImgSize = _getImageSizeInMB(finalImgUri);
-        }
-        console.log(`Final image size: ${finalImgSize.toFixed(2)} MB`);
-
-        return finalImgUri;
-    };
-
-    const _compressImage = async (uri, ratio) => {
-        const manipResult = await ImageManipulator.manipulateAsync(
-            uri,
-            [{ resize: { width: 800 } }], // Adjust width as needed
-            { compress: ratio, format: ImageManipulator.SaveFormat.JPEG } // Adjust quality (0-1)
-        );
-
-        return manipResult;
-    };
-
-    const _pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Image,
-            allowsEditing: true,
-            quality: 0.7,
-        });
-
-        if (!result.canceled) {
-            return result.assets[0].uri;
-        }
-    };
-
-    const _getPickedImage = async () => {
-        let imgUri = await _pickImage();
-        if (!imgUri) {
-            console.log('image picking canceled/failed');
-            return;
-        }
-
-        imgUri = _validateImage(imgUri);
-        if (!imgUri) {
-            console.log('image compression failed');
-            return;
-        }
-        return imgUri;
-    }
-
-    const addImage = async () => {
-        const imgUri = await _getPickedImage();
-        setImages([...images, imgUri]);
-    };
-
-    const replaceImage = async (index) => {
-        const imgUri = await _getPickedImage();
-        if (imgUri) {
-            images[index] = imgUri;
-            setImages([...images]);
-        }
-    }
     const deleteImage = (index) => {
         images.splice(index, 1);
         setImages([...images]);
@@ -104,8 +41,6 @@ const ScanDocumentScreen = ({ navigation }) => {
         }
         await wait(500);
         setLoading(NOT_LOADING);
-        // console.log('full data: ' + fullDat);
-        // router.push({ pathname: '../transcript', params: { transcript: fullDat } });
         navigation.navigate('Transcript', { transcript: fullDat });
     }
 
@@ -176,7 +111,6 @@ const ScanDocumentScreen = ({ navigation }) => {
                 })}
             </ScrollView>
             <View style={styles.bottomButtons}>
-
                 <Button mode="contained" style={styles.button} onPress={addImage}>
                     Add Image
                 </Button>
@@ -184,6 +118,9 @@ const ScanDocumentScreen = ({ navigation }) => {
                     Get Data
                 </Button>
             </View>
+            <ImagePickerDialog ref={imagePickerDialog} setImages={setImages} />
+
+
             {/* Overlay loading indicator */}
             <Portal>
                 <Modal visible={loading !== NOT_LOADING} dismissable={false} contentContainerStyle={styles.modal}>
