@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Dialog, Portal, Text, TextInput, withTheme } from 'react-native-paper';
+import { Button, Dialog, Portal, TextInput, useTheme } from 'react-native-paper';
 
 
 const createStyles = (theme) => StyleSheet.create({
@@ -22,90 +22,57 @@ const createStyles = (theme) => StyleSheet.create({
     }
 });
 
-const TYPE_NOTEBOOK = 'notebook';
-const TYPE_GROUP = 'group';
-
-class AddNewDialog extends React.Component {
-    constructor(props) {
-        super(props);
-        const { theme, onDone } = props; // Access the theme from props
-        this.styles = createStyles(theme);
-        this.onDone = onDone;
-        this.onDone = this.onDone.bind(this);
-        this.state = {
-            visible: false,
-            page: 0,
-            name: '',
-            type: '',
-        };
-        this.showDialog = this.showDialog.bind(this);
-        this.hideDialog = this.hideDialog.bind(this);
-        this.onTextChanged = this.onTextChanged.bind(this);
-        this.create = this.create.bind(this);
-
-    }
-    showDialog() {
-        this.setState({ visible: true });
-    }
-    hideDialog() {
-        this.setState({
-            visible: false,
-            page: 0,
-            name: '',
-        });
-    }
-    onTextChanged(text) {
-        this.setState({ name: text });
-    }
-    create(type) {
-        this.setState({ page: 1, type: type });
-    }
-
-    render() {
-        return (
-            <Portal>
-                <Dialog visible={this.state.visible} onDismiss={this.hideDialog}>
-                    <Dialog.Title>{'Add New ' + this.state.type}</Dialog.Title>
-                    {this.state.page == 0 &&
-                        (<View style={this.styles.buttonsContainer}>
-                            <Button
-                                style={this.styles.button}
-                                icon="folder-open"
-                                onPress={() => { this.create(TYPE_GROUP) }}>Create Group</Button>
-                            <Button
-                                style={this.styles.button}
-                                icon="note-text"
-                                onPress={() => { this.create(TYPE_NOTEBOOK) }}>Create Notebook</Button>
-                        </View>)
-                    }
-                    {this.state.page == 1 &&
-                        (<Dialog.Content>
-                            <TextInput
-                                style={this.styles.input}
-                                mode={'outlined'}
-                                label="Enter name"
-                                value={this.state.name}
-                                onChangeText={this.onTextChanged}
-
-                            />
-                            {/* {this.state.usernameFound &&
-                                <Text style={this.styles.foundText}>User found!</Text>
-                            } */}
-                        </Dialog.Content>)
-                    }
-                    {this.state.page == 1 &&
-                        (<Dialog.Actions>
-                            <Button onPress={() => {
-                                this.onDone(this.state.name, this.state.type);
-                                this.hideDialog();
-                            }}>Ok</Button>
-                            <Button onPress={this.hideDialog}>Cancel</Button>
-                        </Dialog.Actions>)
-                    }
-                </Dialog>
-            </Portal>
-        );
-    }
+export const AddNewDialogType = {
+    UNSELECT: 'unselect',
+    NOTEBOOK: 'notebook',
+    GROUP: 'group'
 }
 
-export default withTheme(AddNewDialog);
+export default function AddNewDialog({ visible, setVisible, type, setType, onDone }) {
+    const theme = useTheme();
+    const styles = createStyles(theme);
+    const [name, setName] = useState('');
+
+    const hideDialog = () => {
+        setName('');
+        setVisible(false);
+    };
+
+    return (
+        <Portal>
+            <Dialog visible={visible} onDismiss={hideDialog}>
+                <Dialog.Title>{'Add New ' + type}</Dialog.Title>
+                {type == AddNewDialogType.UNSELECT ? (<View style={styles.buttonsContainer}>
+                    <Button
+                        style={styles.button}
+                        icon="folder-open"
+                        onPress={() => setType(AddNewDialogType.GROUP)}>Create Group</Button>
+                    <Button
+                        style={styles.button}
+                        icon="note-text"
+                        onPress={() => setType(AddNewDialogType.NOTEBOOK)}>Create Notebook</Button>
+                </View>) : (<>
+                    <Dialog.Content>
+                        <TextInput
+                            style={styles.input}
+                            mode={'outlined'}
+                            label="Enter name"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                        {/* {usernameFound &&
+                                <Text style={styles.foundText}>User found!</Text>
+                            } */}
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => {
+                            onDone(name, type);
+                            hideDialog();
+                        }}>Ok</Button>
+                        <Button onPress={hideDialog}>Cancel</Button>
+                    </Dialog.Actions>
+                </>)}
+            </Dialog>
+        </Portal>
+    );
+}

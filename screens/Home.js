@@ -1,16 +1,15 @@
 import { Alert, BackHandler, FlatList, StyleSheet, Text, View, Image } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Images } from "../constants/";
 import { TouchableOpacity } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FAB, IconButton, useTheme } from "react-native-paper";
-import AddNewDialog from "../components/AddNewDialog";
+import AddNewDialog, { AddNewDialogType } from "../components/AddNewDialog";
 
 
-const EmptyContent = ({ onAdd }) => {
+const EmptyContent = ({ openDialog }) => {
     const theme = useTheme();
     const styles = createEmptyContentStyles(theme);
-    const dialog = useRef(null);
     return <View>
         <Image
             style={styles.image}
@@ -25,8 +24,7 @@ const EmptyContent = ({ onAdd }) => {
             <View style={styles.buttonWrapper}>
                 <TouchableOpacity
                     onPress={() => {
-                        dialog.current.showDialog();
-                        dialog.current.create(TYPE_NOTEBOOK);
+                        openDialog(AddNewDialogType.NOTEBOOK);
                     }}
                     activeOpacity={0.7}
                     style={styles.button}
@@ -43,8 +41,7 @@ const EmptyContent = ({ onAdd }) => {
             <View style={styles.buttonWrapper}>
                 <TouchableOpacity
                     onPress={() => {
-                        dialog.current.showDialog();
-                        dialog.current.create(TYPE_GROUP);
+                        openDialog(AddNewDialogType.GROUP);
                     }}
                     activeOpacity={0.7}
                     style={styles.button}
@@ -59,14 +56,12 @@ const EmptyContent = ({ onAdd }) => {
                 <Text style={styles.buttonText}>Add Group</Text>
             </View>
         </View>
-        <AddNewDialog ref={dialog} onDone={onAdd} />
     </View>;
 }
 
 
-const FilledContent = ({ items, onItemPress, onAdd }) => {
+const FilledContent = ({ items, onItemPress, openDialog }) => {
     // console.log('filled content updated with items: ', items);
-    const dialog = useRef(null);
     const theme = useTheme();
     const styles = createFilledContentStyles(theme);
     return <View style={styles.container}>
@@ -80,8 +75,8 @@ const FilledContent = ({ items, onItemPress, onAdd }) => {
                         style={styles.touchableContainer}
                     >
                         <IconButton
-                            icon={item.type === "notebook" ? "notebook-outline" : "folder-outline"}
-                            iconColor={item.type === "notebook" ? theme.colors.primaryContainer : theme.colors.tertiaryContainer}
+                            icon={item.type === AddNewDialogType.NOTEBOOK ? "notebook-outline" : "folder-outline"}
+                            iconColor={item.type === AddNewDialogType.NOTEBOOK ? theme.colors.primaryContainer : theme.colors.tertiaryContainer}
                             size={30}
                         />
                         <Text style={styles.itemText}
@@ -98,15 +93,12 @@ const FilledContent = ({ items, onItemPress, onAdd }) => {
             style={styles.fab}
             icon="plus"
             label="Add"
-            onPress={() => dialog.current.showDialog()}
+            onPress={() => openDialog(AddNewDialogType.UNSELECT)}
         />
-        <AddNewDialog ref={dialog} onDone={onAdd} />
     </View>;
 }
 
 const ROOT_PATH = '/root/';
-const TYPE_NOTEBOOK = 'notebook';
-const TYPE_GROUP = 'group';
 
 const HomeScreen = ({ navigation }) => {
     const theme = useTheme();
@@ -114,6 +106,9 @@ const HomeScreen = ({ navigation }) => {
 
     const [currentPath, setCurrentPath] = useState(ROOT_PATH);  // Start at root
     const [items, setItems] = useState([]);
+
+    const [dlgVisible, setDlgVisible] = useState(false);
+    const [dlgType, setDlgType] = useState(AddNewDialogType.UNSELECT);
 
     useEffect(() => {
         loadList(currentPath);
@@ -153,10 +148,10 @@ const HomeScreen = ({ navigation }) => {
 
             const items = [];
             for (let i = 0; i < groups.length; i++) {
-                items.push({ 'name': groups[i], 'type': TYPE_GROUP })
+                items.push({ 'name': groups[i], 'type': AddNewDialogType.GROUP })
             }
             for (let i = 0; i < notebooks.length; i++) {
-                items.push({ 'name': notebooks[i], 'type': TYPE_NOTEBOOK })
+                items.push({ 'name': notebooks[i], 'type': AddNewDialogType.NOTEBOOK })
             }
             setItems(items);
         } catch (e) {
@@ -164,12 +159,15 @@ const HomeScreen = ({ navigation }) => {
         }
     };
 
-    // console.log('rendering at: ' + currentPath);
+    const openDialog = (type) => {
+        setDlgType(type);
+        setDlgVisible(true);
+    }
 
     const addItem = async (name, type) => {
         // Validity checks
         name = name.trim();
-        const isNotebook = type === TYPE_NOTEBOOK;
+        const isNotebook = type === AddNewDialogType.NOTEBOOK;
         const typeN = isNotebook ? 'Notebook' : 'Group';
         console.log(`to add ${typeN} named '${name}' at path: ${currentPath}`);
 
@@ -197,7 +195,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const onItemPress = (item) => {
-        if (item.type === TYPE_NOTEBOOK) {
+        if (item.type === AddNewDialogType.NOTEBOOK) {
             openNotebook(item.name);
         } else {
             openGroup(item.name);
@@ -216,6 +214,7 @@ const HomeScreen = ({ navigation }) => {
             path: `${currentPath}$_notebooks/${notebookName}`
         });
     };
+
     const clearStorage = async () => {
         try {
             await AsyncStorage.clear(); // Clears AsyncStorage
@@ -234,10 +233,11 @@ const HomeScreen = ({ navigation }) => {
             </Text>
 
             {items.length === 0 ? (
-                <EmptyContent onAdd={addItem} />
+                <EmptyContent openDialog={openDialog} />
             ) : (
-                <FilledContent items={items} onItemPress={onItemPress} onAdd={addItem} />
+                <FilledContent items={items} onItemPress={onItemPress} openDialog={openDialog} />
             )}
+            <AddNewDialog visible={dlgVisible} setVisible={setDlgVisible} type={dlgType} setType={setDlgType} onDone={addItem} />
         </View>
     );
 };
