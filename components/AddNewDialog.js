@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Dialog, Portal, TextInput, useTheme } from 'react-native-paper';
+import ItemType from '../constants/ItemType';
 
 
 const createStyles = (theme) => StyleSheet.create({
@@ -22,35 +23,40 @@ const createStyles = (theme) => StyleSheet.create({
     }
 });
 
-export const AddNewDialogType = {
-    UNSELECT: 'unselect',
-    NOTEBOOK: 'notebook',
-    GROUP: 'group'
-}
-
-export default function AddNewDialog({ visible, setVisible, type, setType, onDone }) {
+export default AddNewDialog = forwardRef(function ({ onDone }, ref) {
     const theme = useTheme();
     const styles = createStyles(theme);
     const [name, setName] = useState('');
+    const [visible, setVisible] = useState(false);
+    const [type, setType] = useState(null);
+
+    useEffect(() => {
+        ref.current = {};
+        ref.current.createDialog = (withType) => {
+            setName('');
+            setType(withType);
+            setVisible(true);
+        }
+    }, [ref]);
+
 
     const hideDialog = () => {
-        setName('');
         setVisible(false);
     };
 
     return (
         <Portal>
             <Dialog visible={visible} onDismiss={hideDialog}>
-                <Dialog.Title>{'Add New ' + type}</Dialog.Title>
-                {type == AddNewDialogType.UNSELECT ? (<View style={styles.buttonsContainer}>
+                <Dialog.Title>{'Add New ' + (type ? type : '')}</Dialog.Title>
+                {type === null ? (<View style={styles.buttonsContainer}>
                     <Button
                         style={styles.button}
                         icon="folder-open"
-                        onPress={() => setType(AddNewDialogType.GROUP)}>Create Group</Button>
+                        onPress={() => setType(ItemType.GROUP)}>Create Group</Button>
                     <Button
                         style={styles.button}
                         icon="note-text"
-                        onPress={() => setType(AddNewDialogType.NOTEBOOK)}>Create Notebook</Button>
+                        onPress={() => setType(ItemType.NOTEBOOK)}>Create Notebook</Button>
                 </View>) : (<>
                     <Dialog.Content>
                         <TextInput
@@ -60,9 +66,6 @@ export default function AddNewDialog({ visible, setVisible, type, setType, onDon
                             value={name}
                             onChangeText={setName}
                         />
-                        {/* {usernameFound &&
-                                <Text style={styles.foundText}>User found!</Text>
-                            } */}
                     </Dialog.Content>
                     <Dialog.Actions>
                         <Button onPress={() => {
@@ -75,4 +78,4 @@ export default function AddNewDialog({ visible, setVisible, type, setType, onDon
             </Dialog>
         </Portal>
     );
-}
+});

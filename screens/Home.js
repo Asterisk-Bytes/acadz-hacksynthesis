@@ -1,11 +1,11 @@
 import { Alert, BackHandler, FlatList, StyleSheet, Text, View, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Images } from "../constants/";
 import { TouchableOpacity } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FAB, IconButton, useTheme } from "react-native-paper";
-import AddNewDialog, { AddNewDialogType } from "../components/AddNewDialog";
-
+import AddNewDialog from "../components/AddNewDialog";
+import ItemType from "../constants/ItemType";
 
 const EmptyContent = ({ openDialog }) => {
     const theme = useTheme();
@@ -24,7 +24,7 @@ const EmptyContent = ({ openDialog }) => {
             <View style={styles.buttonWrapper}>
                 <TouchableOpacity
                     onPress={() => {
-                        openDialog(AddNewDialogType.NOTEBOOK);
+                        openDialog(ItemType.NOTEBOOK);
                     }}
                     activeOpacity={0.7}
                     style={styles.button}
@@ -41,7 +41,7 @@ const EmptyContent = ({ openDialog }) => {
             <View style={styles.buttonWrapper}>
                 <TouchableOpacity
                     onPress={() => {
-                        openDialog(AddNewDialogType.GROUP);
+                        openDialog(ItemType.GROUP);
                     }}
                     activeOpacity={0.7}
                     style={styles.button}
@@ -59,7 +59,6 @@ const EmptyContent = ({ openDialog }) => {
     </View>;
 }
 
-
 const FilledContent = ({ items, onItemPress, openDialog }) => {
     // console.log('filled content updated with items: ', items);
     const theme = useTheme();
@@ -75,8 +74,8 @@ const FilledContent = ({ items, onItemPress, openDialog }) => {
                         style={styles.touchableContainer}
                     >
                         <IconButton
-                            icon={item.type === AddNewDialogType.NOTEBOOK ? "notebook-outline" : "folder-outline"}
-                            iconColor={item.type === AddNewDialogType.NOTEBOOK ? theme.colors.primaryContainer : theme.colors.tertiaryContainer}
+                            icon={item.type === ItemType.NOTEBOOK ? "notebook-outline" : "folder-outline"}
+                            iconColor={item.type === ItemType.NOTEBOOK ? theme.colors.primaryContainer : theme.colors.tertiaryContainer}
                             size={30}
                         />
                         <Text style={styles.itemText}
@@ -93,32 +92,45 @@ const FilledContent = ({ items, onItemPress, openDialog }) => {
             style={styles.fab}
             icon="plus"
             label="Add"
-            onPress={() => openDialog(AddNewDialogType.UNSELECT)}
+            onPress={() => openDialog(null)}
         />
     </View>;
 }
 
 const ROOT_PATH = '/root/';
+const SEP = '/';
+const NOTEBOOK_SUFFIX = '_notebooks';
+
+const keyForSubGroups = path => path;
+const keyForNotebooks = path => path + NOTEBOOK_SUFFIX;
+
+const getGroupPath = (currentPath, groupName) => keyForSubGroups(currentPath) + groupName + SEP;
+const getNotebookPath = (currentPath, notebookName) => keyForNotebooks(currentPath) + SEP + notebookName;
+
+const getPreviousPath = (path) => {
+    const _paths = path.split(SEP).filter(Boolean);
+    _paths.pop(); // Remove the last group
+    return (_paths.length ? (SEP + _paths.join(SEP) + SEP) : ROOT_PATH); // If empty, go back to root
+};
+
+const namesOfItemsOfType = (items, type) => items.filter(x => x.type === type).map(x => x.name);
+const createItem = (name, type) => ({ 'name': name, 'type': type });
 
 const HomeScreen = ({ navigation }) => {
     const theme = useTheme();
     const styles = createStyles(theme);
 
-    const [currentPath, setCurrentPath] = useState(ROOT_PATH);  // Start at root
+    const [currentPath, setCurrentPath] = useState(ROOT_PATH);
     const [items, setItems] = useState([]);
 
-    const [dlgVisible, setDlgVisible] = useState(false);
-    const [dlgType, setDlgType] = useState(AddNewDialogType.UNSELECT);
+    const myDialog = useRef({ createDialog: null });
 
     useEffect(() => {
         loadList(currentPath);
 
         const goBack = () => {
             if (currentPath === ROOT_PATH) return false;  // If at root, can't go back
-
-            const paths = currentPath.split('/').filter(Boolean);
-            paths.pop(); // Remove the last group
-            setCurrentPath(paths.length ? `/${paths.join('/')}/` : ROOT_PATH); // If empty, go back to root
+            setCurrentPath(getPreviousPath(currentPath)); // If empty, go back to root
             return true;
         };
 
@@ -140,18 +152,18 @@ const HomeScreen = ({ navigation }) => {
 
     const loadList = async (path) => {
         try {
-            const storedGroups = await AsyncStorage.getItem(path);
-            const storedNotebooks = await AsyncStorage.getItem(`${path}_notebooks`); // Use a different key for notebooks
-            // group name cant be '_notebooks'
+            const storedGroups = await AsyncStorage.getItem(keyForSubGroups(path));
+            const storedNotebooks = await AsyncStorage.getItem(keyForNotebooks(path));
+
             const groups = storedGroups ? JSON.parse(storedGroups) : [];
             const notebooks = storedNotebooks ? JSON.parse(storedNotebooks) : [];
 
             const items = [];
             for (let i = 0; i < groups.length; i++) {
-                items.push({ 'name': groups[i], 'type': AddNewDialogType.GROUP })
+                items.push(createItem(groups[i], ItemType.GROUP))
             }
             for (let i = 0; i < notebooks.length; i++) {
-                items.push({ 'name': notebooks[i], 'type': AddNewDialogType.NOTEBOOK })
+                items.push(createItem(notebooks[i], ItemType.NOTEBOOK))
             }
             setItems(items);
         } catch (e) {
@@ -159,85 +171,76 @@ const HomeScreen = ({ navigation }) => {
         }
     };
 
-    const openDialog = (type) => {
-        setDlgType(type);
-        setDlgVisible(true);
-    }
-
     const addItem = async (name, type) => {
-        // Validity checks
         name = name.trim();
-        const isNotebook = type === AddNewDialogType.NOTEBOOK;
-        const typeN = isNotebook ? 'Notebook' : 'Group';
-        console.log(`to add ${typeN} named '${name}' at path: ${currentPath}`);
-
-        if (!name) {
-            Alert.alert('Error', typeN + ' name cannot be empty');
+        if (name === '') {
+            Alert.alert('Error', type + ' name cannot be empty');
+            return;
+        }
+        if (name === NOTEBOOK_SUFFIX) {
+            Alert.alert('Error', type + ' name cannot be ' + NOTEBOOK_SUFFIX);
             return;
         }
 
         try {
-            const storageKey = currentPath + (isNotebook ? '_notebooks' : '');
-            const mItems = items.filter(x => x.type === type).map(x => x.name);
+            const storageKey = (type === ItemType.NOTEBOOK) ? keyForNotebooks(currentPath) : keyForSubGroups(currentPath);
+            const filteredNamesOfItems = namesOfItemsOfType(items, type);
 
-            if (mItems.includes(name)) {
-                Alert.alert('Error', typeN + ' already exists!');
+            if (filteredNamesOfItems.includes(name)) {
+                Alert.alert('Error', type + ' with same name already exists!');
                 return;
             }
 
-            await AsyncStorage.setItem(storageKey, JSON.stringify([...mItems, name]));
-            setItems([...items, { name: name, type: type }]);
+            await AsyncStorage.setItem(storageKey, JSON.stringify([...filteredNamesOfItems, name]));
+            setItems([...items, createItem(name, type)]);
 
         } catch (e) {
-            console.error('Failed to create ' + typeN, e);
-            Alert.alert('Error', 'Error while creating ' + typeN);
+            console.error('Failed to create ' + type, e);
+            Alert.alert('Error', 'Error while creating ' + type);
         }
     };
 
     const onItemPress = (item) => {
-        if (item.type === AddNewDialogType.NOTEBOOK) {
+        if (item.type === ItemType.NOTEBOOK) {
             openNotebook(item.name);
         } else {
             openGroup(item.name);
         }
     }
 
-    // Open a group (navigate into it)
     const openGroup = (groupName) => {
-        setCurrentPath(`${currentPath}${groupName}/`);
+        setCurrentPath(getGroupPath(currentPath, groupName));
     };
 
     const openNotebook = (notebookName) => {
-        console.log('open notebook: ' + notebookName);
-        // router.push({ pathname: 'notebook', params: { path: `${currentPath}$_notebooks/${notebookName}` } });
         navigation.navigate('Notebook', {
-            path: `${currentPath}$_notebooks/${notebookName}`
+            path: getNotebookPath(currentPath, notebookName)
         });
     };
 
     const clearStorage = async () => {
         try {
-            await AsyncStorage.clear(); // Clears AsyncStorage
+            await AsyncStorage.clear();
             setCurrentPath(ROOT_PATH);
-            setItems([]);  // Reset state to an empty array
+            setItems([]);
             console.log('Storage cleared successfully');
         } catch (e) {
             console.error('Failed to clear storage', e);
         }
     };
 
+    const openDialog = withType => myDialog.current.createDialog(withType);
+
     return (
         <View style={styles.container}>
-            <Text id="breadcrums" style={styles.breadcrumbs}>
-                {currentPath}
-            </Text>
+            <Text style={styles.breadcrumbs}> {currentPath} </Text>
 
             {items.length === 0 ? (
-                <EmptyContent openDialog={openDialog} />
+                <EmptyContent openDialog={myDialog.current.createDialog} />
             ) : (
                 <FilledContent items={items} onItemPress={onItemPress} openDialog={openDialog} />
             )}
-            <AddNewDialog visible={dlgVisible} setVisible={setDlgVisible} type={dlgType} setType={setDlgType} onDone={addItem} />
+            <AddNewDialog ref={myDialog} onDone={addItem} />
         </View>
     );
 };
