@@ -63,7 +63,7 @@ export default AddNewDialog = forwardRef(function ({ onDone }, ref) {
                             style={styles.input}
                             mode={'outlined'}
                             label="Enter name"
-                            value={name}
+                            defaultValue={name}
                             onChangeText={setName}
                         />
                     </Dialog.Content>
