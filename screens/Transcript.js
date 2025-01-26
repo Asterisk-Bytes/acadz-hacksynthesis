@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View, TextInput, Alert } from 'react-native';
 import { Text, Button, useTheme } from 'react-native-paper';
 
@@ -11,13 +12,29 @@ const TranscriptScreen = ({ navigation, route }) => {
     const [editingMode, setEditingMode] = useState(false);
     const [editedTranscript, setEditedTranscript] = useState('');
     const [transcript, setTranscript] = useState(params.transcript);
-    // if (!transcript) Alert.alert('Transcript loading failed!');
+
+    useEffect(() => {
+        if (params.transcript) {
+            AsyncStorage.setItem(params.path + '/transcript', params.transcript);
+            // console.log('saving transcript');
+        }
+        else {
+            loadTranscript(params.path);
+            // console.log('loading transcript');
+        }
+    }, [params]);
+
+    const loadTranscript = async (path) => {
+        const loadedTranscript = await AsyncStorage.getItem(path + '/transcript');
+        setTranscript(loadedTranscript);
+    }
 
     const startEdit = () => {
         setEditedTranscript(transcript);
         setEditingMode(true);
     }
     const confirmEdit = () => {
+        AsyncStorage.setItem(params.path + '/transcript', editedTranscript);
         setTranscript(editedTranscript);
         setEditedTranscript('');
         setEditingMode(false);
@@ -26,18 +43,15 @@ const TranscriptScreen = ({ navigation, route }) => {
         setEditedTranscript('');
         setEditingMode(false);
     }
-    const summarize = () => {
-        navigation.navigate('Summary', { transcript: transcript });
-        // router.push({ pathname: '../summary', params: { transcript: transcript } });
-    }
-    const flashcards = () => {
-        navigation.navigate('Flashcards', { transcript: transcript });
-        // router.push({ pathname: '../flashcards', params: { transcript: transcript } });
-    }
-    const ytSuggest = () => {
-        navigation.navigate('YoutubeSuggestions', { transcript: transcript });
-        // router.push({ pathname: '../yt-suggest', params: { transcript: transcript } });
-    }
+    // const summarize = () => {
+    //     navigation.navigate('Summary', { transcript: transcript });
+    // }
+    // const flashcards = () => {
+    //     navigation.navigate('Flashcards', { transcript: transcript });
+    // }
+    // const ytSuggest = () => {
+    //     navigation.navigate('YoutubeSuggestions', { transcript: transcript });
+    // }
 
     return (
         <View style={styles.mainView}>
@@ -60,9 +74,20 @@ const TranscriptScreen = ({ navigation, route }) => {
             </View>
             <View style={styles.containerTools}>
                 {!editingMode &&
-                    <Button mode="outlined" style={styles.specialButton} onPress={startEdit}>
-                        Edit Transcript
-                    </Button>}
+                    <>
+                        <Button mode="outlined" style={styles.specialButton} onPress={startEdit}>
+                            Edit Transcript
+                        </Button>
+                        {/* <Button mode="contained" disabled={editingMode} onPress={summarize}>
+                            Summarize
+                        </Button>
+                        <Button mode="contained" disabled={editingMode} onPress={flashcards}>
+                            Flashcards
+                        </Button>
+                        <Button mode="contained" disabled={editingMode} onPress={ytSuggest}>
+                            Youtube video suggestions
+                        </Button> */}
+                    </>}
                 {editingMode &&
                     <View style={styles.editOptions}>
                         <Button mode="outlined" style={styles.specialButton} onPress={cancelEdit}>
@@ -73,15 +98,7 @@ const TranscriptScreen = ({ navigation, route }) => {
                         </Button>
                     </View>
                 }
-                <Button mode="contained" disabled={editingMode} onPress={summarize}>
-                    Summarize
-                </Button>
-                <Button mode="contained" disabled={editingMode} onPress={flashcards}>
-                    Flashcards
-                </Button>
-                <Button mode="contained" disabled={editingMode} onPress={ytSuggest}>
-                    Youtube video suggestions
-                </Button>
+
             </View>
         </View>
     );

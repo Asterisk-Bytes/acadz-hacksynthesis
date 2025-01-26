@@ -16,43 +16,45 @@ const NotebookScreen = ({ navigation, route }) => {
     const [ytsugg, setYtsugg] = useState(null);
 
 
-    // useEffect(() => {
-    //     loadDatas();
+    useEffect(() => {
+        loadDatas();
 
-    //     navigation.setOptions({
-    //         headerLeft: () => (<IconButton
-    //             icon='arrow-left'
-    //             onPress={navigation.goBack}
-    //             iconColor={theme.colors.onPrimaryContainer}
-    //         />),
-    //         headerRight: () => (<IconButton
-    //             icon="dots-vertical"
-    //             // onPress={clearStorage}
-    //             iconColor={theme.colors.onPrimaryContainer}
-    //         />)
-    //     });
-    // }, [navigation]);
+        // navigation.setOptions({
+        //     headerLeft: () => (<IconButton
+        //         icon='arrow-left'
+        //         onPress={navigation.goBack}
+        //         iconColor={theme.colors.onPrimaryContainer}
+        //     />),
+        //     headerRight: () => (<IconButton
+        //         icon="dots-vertical"
+        //         // onPress={clearStorage}
+        //         iconColor={theme.colors.onPrimaryContainer}
+        //     />)
+        // });
+    }, [navigation]);
 
-    // const loadDatas = async () => {
-    //     try {
-    //         const data = await AsyncStorage.getItem(path);
-    //         const parsedData = data ? JSON.parse(data) : {};
-    //         if (!('transcript' in parsedData)) return;
+    const loadDatas = async () => {
+        try {
+            // const data = await AsyncStorage.getItem(path);
+            // const parsedData = data ? JSON.parse(data) : {};
+            // if (!('transcript' in parsedData)) return;
 
-    //         setTranscript(parsedData.transcript);
-    //         if ('summary' in parsedData) {
-    //             setSummary(parsedData.summary);
-    //         }
-    //         if ('flashcards' in parsedData) {
-    //             setFlashcards(parsedData.flashcards);
-    //         }
-    //         if ('ytsugg' in parsedData) {
-    //             setYtsugg(parsedData.ytsugg);
-    //         }
-    //     } catch (e) {
-    //         console.error('Failed to load data', e);
-    //     }
-    // };
+            // setTranscript(parsedData.transcript);
+            // if ('summary' in parsedData) {
+            //     setSummary(parsedData.summary);
+            // }
+            // if ('flashcards' in parsedData) {
+            //     setFlashcards(parsedData.flashcards);
+            // }
+            // if ('ytsugg' in parsedData) {
+            //     setYtsugg(parsedData.ytsugg);
+            // }
+            const trans = await AsyncStorage.getItem(path + '/transcript');
+            setTranscript(trans);
+        } catch (e) {
+            console.error('Failed to load data', e);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -60,28 +62,28 @@ const NotebookScreen = ({ navigation, route }) => {
                 <IconButton
                     icon="microphone-variant"
                     size={42}
-                    onPress={() => navigation.navigate("RecordLecture")}
+                    onPress={() => navigation.navigate("RecordLecture", { path: path })}
                     iconColor={theme.colors.tertiaryContainer}
                     containerColor={theme.colors.onSecondary}
                 />
                 <IconButton
                     icon="line-scan"
                     size={42}
-                    onPress={() => navigation.navigate("ScanDocument")}
+                    onPress={() => navigation.navigate("ScanDocument", { path: path })}
                     iconColor={theme.colors.tertiaryContainer}
                     containerColor={theme.colors.onSecondary}
                 />
                 <IconButton
                     icon="youtube"
                     size={42}
-                    onPress={() => navigation.navigate("YoutubeTranscript")}
+                    onPress={() => navigation.navigate("YoutubeTranscript", { path: path })}
                     iconColor={theme.colors.tertiaryContainer}
                     containerColor={theme.colors.onSecondary}
                 />
                 <IconButton
                     icon="file-pdf-box"
                     size={42}
-                    onPress={() => navigation.navigate("UploadDocument")}
+                    onPress={() => navigation.navigate("UploadDocument", { path: path })}
                     iconColor={theme.colors.tertiaryContainer}
                     containerColor={theme.colors.onSecondary}
                 />
@@ -98,49 +100,70 @@ const NotebookScreen = ({ navigation, route }) => {
                 {transcript &&
                     <Button
                         mode="contained"
-                        style={styles.button1}>
+                        style={styles.button1}
+                        onPress={() => {
+                            navigation.navigate('Transcript', { path: path });
+                        }}>
                         Transcript
                     </Button>
                 }
                 {transcript && summary &&
                     <Button
                         mode="contained"
-                        style={styles.button1}>
+                        style={styles.button1}
+                        onPress={() => {
+                            navigation.navigate('Summary', { path: path });
+                        }}>
                         Summary
                     </Button>
                 }
                 {transcript && flashcards &&
                     <Button
                         mode="contained"
-                        style={styles.button1}>
+                        style={styles.button1}
+                        onPress={() => {
+                            navigation.navigate('Flashcards', { path: path });
+                        }}>
                         Flashcards
                     </Button>
                 }
                 {transcript && ytsugg &&
                     <Button
                         mode="contained"
-                        style={styles.button1}>
+                        style={styles.button1}
+                        onPress={() => {
+                            navigation.navigate('YoutubeSuggestions', { path: path });
+                        }}>
                         Youtube Suggestions
                     </Button>
                 }
                 {transcript && !summary &&
                     <Button
                         mode="outlined"
-                        style={styles.button2}>
+                        style={styles.button2}
+                        onPress={() => {
+                            navigation.navigate('Summary', { path: path });
+                        }}>
                         Generate Summary
                     </Button>
                 }
                 {transcript && !flashcards &&
                     <Button
                         mode="outlined"
-                        style={styles.button2}>
+                        style={styles.button2}
+                        onPress={() => {
+                            navigation.navigate('Flashcards', { path: path });
+                        }}>
                         Generate Flashcards
                     </Button>
                 }
                 {transcript && !ytsugg &&
                     <Button
                         mode="outlined"
-                        style={styles.button2}>
+                        style={styles.button2}
+                        onPress={() => {
+                            navigation.navigate('YoutubeSuggestions', { path: path });
+                        }}>
                         Get Youtube Suggestions
                     </Button>
                 }

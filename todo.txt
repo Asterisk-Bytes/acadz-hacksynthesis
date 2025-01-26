@@ -1,0 +1,11 @@
+currently on 0.2.1a
+
+design landing page
+redesign app control-flow with adding/removing/refining features/pages
+setup base for themed setup (with proper colours)
+
+start working on the new pages
+
+
+--------------
+after 1.0.0 release
