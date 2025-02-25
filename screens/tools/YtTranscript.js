@@ -3,7 +3,7 @@ import { View, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
 import { ActivityIndicator, Modal, Portal, Text, TextInput, Button, useTheme, } from 'react-native-paper';
 
-const YoutubeTranscriptScreen = ({ navigation, route }) => {
+const YoutubeTranscriptScreen = ({ navigation }) => {
     const theme = useTheme();
     const styles = createStyles(theme);
 
@@ -50,14 +50,16 @@ const YoutubeTranscriptScreen = ({ navigation, route }) => {
     const getTranscript = async () => {
         setLoading(true);
         const tdata = await fetchTranscript();
+        // const tdata = await fetchTranscript2();
 
         setLoading(false);
-        navigation.navigate('Transcript', { transcript: tdata, path: route.params.path });
+        // router.push({ pathname: '../transcript', params: { transcript: tdata } });
+        navigation.navigate('Transcript', { transcript: tdata });
     }
 
-    // const fetchTranscript2 = async () => {
-    //     return "Sample transcript for:" + youtubeLink;
-    // }
+    const fetchTranscript2 = async () => {
+        return "Sample transcript for:" + youtubeLink;
+    }
 
     const fetchTranscript = async () => {
         const videoId = getVideoID(youtubeLink);

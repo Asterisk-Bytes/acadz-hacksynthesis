@@ -110,7 +110,7 @@ async function sendForTranscription(audioUrl, setter) {
     }
 }
 
-export default function RecordLectureScreen({ navigation, route }) {
+export default function RecordLectureScreen({ navigation }) {
     const theme = useTheme();
     const styles = createStyles(theme);
 
@@ -256,7 +256,7 @@ export default function RecordLectureScreen({ navigation, route }) {
         }
     }
     const handleDone = async () => {
-        navigation.navigate('Transcript', { transcript: transcript, path: route.params.path });
+        navigation.navigate('Transcript', { transcript: transcript });
     }
 
     return (

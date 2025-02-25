@@ -6,11 +6,9 @@ import ImagePickerDialog from '../../components/ImagePickerDialog';
 
 const NOT_LOADING = -1.0;
 
-const ScanDocumentScreen = ({ navigation, route }) => {
+const ScanDocumentScreen = ({ navigation }) => {
     const theme = useTheme();
     const styles = createStyles(theme);
-
-    console.log(route.params.path);
 
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(NOT_LOADING);
@@ -43,7 +41,7 @@ const ScanDocumentScreen = ({ navigation, route }) => {
         }
         await wait(500);
         setLoading(NOT_LOADING);
-        navigation.navigate('Transcript', { transcript: fullDat, path: route.params.path });
+        navigation.navigate('Transcript', { transcript: fullDat });
     }
 
     const performOCR = async (imgUri) => {
