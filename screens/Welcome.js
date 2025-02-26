@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Image, StyleSheet, Alert } from "react-native";
+import { View, Image, StyleSheet, Alert, Animated } from "react-native";
 import { Images } from "../constants/";
 import { useTheme, Button, Text } from "react-native-paper";
 import LinearGradient from "react-native-linear-gradient";
@@ -7,6 +7,7 @@ import Constants from 'expo-constants';
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import AlertDialog from "../components/AlertDialog";
+import ShimmerText from "../components/ShimmerText";
 
 const app_info = `
 Version: 0.3.x (alpha)
@@ -64,8 +65,15 @@ export default function WelcomeScreen({ navigation }) {
                 resizeMode="contain"
             />
             <View style={styles.bottomContainer}>
+                
+                <ShimmerText
+                    style={{height:70}}
+                    text="acadz"
+                    textStyle={styles.titleText}
+                    textColor={COLOR_5_text1}
+                    shimmerColor={COLOR_4_btnText}
+                    shimmerDuration={3000}/>
 
-                <Text style={styles.titleText}>acadz</Text>
                 <Text style={styles.subtitleText}>
                     Your <Text style={[styles.subtitleText, { fontWeight: 'bold', fontStyle: 'italic' }]}>
                         AI-powered study companion
@@ -117,7 +125,6 @@ export default function WelcomeScreen({ navigation }) {
     );
 }
 
-
 const createStyles = theme => StyleSheet.create({
     container: {
         flex: 1,
@@ -149,9 +156,6 @@ const createStyles = theme => StyleSheet.create({
         fontWeight: 'bold',
         fontFamily: 'Poppins',
         fontSize: 50,
-        marginTop: 12,
-        marginHorizontal: 12,
-        color: COLOR_5_text1,
     },
 
     subtitleText: {
