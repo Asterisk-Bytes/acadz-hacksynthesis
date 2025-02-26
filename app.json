@@ -35,6 +35,14 @@
                         "com.google.android.googlequicksearchbox"
                     ]
                 }
+            ],
+            [
+                "expo-font",
+                {
+                    "fonts": [
+                        "./assets/fonts/Poppins.ttf"
+                    ]
+                }
             ]
         ],
         "extra": {

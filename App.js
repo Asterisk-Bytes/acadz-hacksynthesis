@@ -26,12 +26,23 @@ const Stack = createStackNavigator();
 const DefaultTheme = MD3DarkTheme;
 DefaultTheme.colors = {
     ...MD3DarkTheme.colors,
-    background: '#111',
-    surface: '#1d1d1d',
-    surfaceVariant: '#2d2c2e',
-    onTertiary: '#946300',
-    tertiaryContainer: '#eb9d02',
+    primary:            "rgb(220, 184, 255)",
+    onPrimary:          "rgb(71, 12, 122)",
+    primaryContainer:   "rgb(95, 43, 146)",
+    onPrimaryContainer: "rgb(240, 219, 255)",
+    secondary:          "rgb(208, 193, 218)",
+    onSecondary:        "rgb(54, 44, 63)",
+    secondaryContainer: "rgb(77, 67, 87)",
+    onSecondaryContainer:"rgb(237, 221, 246)",
+    
+    background:         'rgb(17, 17, 17)',
+    surface:            'rgb(29, 29, 29)',
+    surfaceVariant:     'rgb(45, 44, 46)',
+    onTertiary:         'rgb(148, 99, 0)',
+    tertiaryContainer:  'rgb(235, 157, 2)',
 }
+
+
 // "tertiary": "rgb(128, 81, 88)", 
 // "onTertiary": "rgb(255, 255, 255)",
 // "tertiaryContainer": "rgb(255, 217, 221)",
