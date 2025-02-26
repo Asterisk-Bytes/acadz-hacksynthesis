@@ -38,6 +38,7 @@ DefaultTheme.colors = {
     background:         'rgb(17, 17, 17)',
     surface:            'rgb(29, 29, 29)',
     surfaceVariant:     'rgb(45, 44, 46)',
+    tertiary:           'rgb(255, 227, 188)',
     onTertiary:         'rgb(148, 99, 0)',
     tertiaryContainer:  'rgb(255, 169, 47)',
     onTertiaryContainer:'rgb(224, 210, 184)',
@@ -63,7 +64,7 @@ export default function App() {
                 }}>
                     <Stack.Screen name="Welcome" component={WelcomeScreen} />
                     <Stack.Screen name="Home" component={HomeScreen} />
-                    <Stack.Screen name="Notebook" component={NotebookScreen} />
+                    <Stack.Screen name="Notebook" component={NotebookScreen} options={{headerTintColor: DefaultTheme.colors.tertiary}}/>
 
                     <Stack.Screen name="RecordLecture" component={RecordLectureScreen} />
                     <Stack.Screen name="ScanDocument" component={ScanDocumentScreen} />

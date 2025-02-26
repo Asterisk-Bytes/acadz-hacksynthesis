@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Image, StyleSheet, Alert } from "react-native";
 import { Images } from "../constants/";
 import { useTheme, Button, Text } from "react-native-paper";
@@ -6,17 +6,20 @@ import LinearGradient from "react-native-linear-gradient";
 import Constants from 'expo-constants';
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
+import AlertDialog from "../components/AlertDialog";
 
 const app_info = `
-Version: 0.2.1a (alpha)
-Date: 15-10-2024
+Version: 0.3.x (alpha)
+Date: TBD
 Devs: Mohikshit Ghorai, Pritam Das, Suparno Saha
 
 Initially made for #HackSynthesis 2024 hackathon at UEM, Newton, Kolkata
 `.trim();
 const disclaimer = `
 This app is currently in alpha stage. All features are not available yet!
+
 Any transcript/summary/flashcards etc, you add/generate are NOT saved.
+
 We are sorry for the inconvenience!
 `.trim();
 
@@ -34,7 +37,9 @@ export default function WelcomeScreen({ navigation }) {
 
     useFonts({
         'Poppins': require('../assets/fonts/Poppins.ttf'),
-      });
+    });
+
+    const alertDialog = useRef({ createDialog: null });
     
 
     useEffect(() => {
@@ -78,14 +83,14 @@ export default function WelcomeScreen({ navigation }) {
                         mode="text"
                         textColor={COLOR_1_extraBtn}
                         labelStyle={{textDecorationLine: 'underline'}}
-                        onPress={() => Alert.alert('Disclaimer', disclaimer)}>
+                        onPress={() => alertDialog.current.createDialog('Disclaimer', disclaimer)}>
                         Disclaimer</Button>
 
                     <Button
                         mode="text"
                         textColor={COLOR_1_extraBtn}
                         labelStyle={{textDecorationLine: 'underline'}}
-                        onPress={() => Alert.alert('App Info', app_info)}>
+                        onPress={() => alertDialog.current.createDialog('App Info', app_info)}>
                         App Info</Button>
                 </View>
 
@@ -106,6 +111,7 @@ export default function WelcomeScreen({ navigation }) {
                 </LinearGradient>
                 
             </View>
+            <AlertDialog ref={alertDialog}/>
             <StatusBar style="light" />
         </LinearGradient>
     );
@@ -128,14 +134,9 @@ const createStyles = theme => StyleSheet.create({
     noisyBackgroundFilter: {
         position: 'absolute',
         opacity: 0.4,
-        width: '125%',
-        height: '125%',
-        top: '-6%',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        resizeMode: 'stretch', 
-          
+        // transform:[{scale:0.333}, {translateX:-1080}, {translateY:-2412}],
+        transform:[{scale:0.4}, {translateY:-1800}],
+        resizeMode: 'stretch',
     },
 
     bottomContainer: {

@@ -69,28 +69,26 @@ const HomeScreen = ({ navigation }) => {
         addItem(name, type, currentPath);
     };
 
-    return (
-            <LinearGradient
-                colors={[COLOR_0_bgGradient, 'black']}
-                start={{x:0.5, y:0.0}}
-                end={{x:0.5, y:0.5}}
-                style={styles.container}
-            >
-                <Image
-                    style={styles.noisyBackgroundFilter}
-                    source={Images.noisyBackground}
-                    resizeMode="contain"
-                />
-            <Text style={styles.breadcrumbs}> {currentPath} </Text>
+    return (<LinearGradient
+        colors={[COLOR_0_bgGradient, 'black']}
+        start={{ x: 0.5, y: 0.0 }}
+        end={{ x: 0.5, y: 0.5 }}
+        style={styles.container}
+    >
+        <Image
+            style={styles.noisyBackgroundFilter}
+            source={Images.noisyBackground}
+            resizeMode="contain"
+        />
+        <Text style={styles.breadcrumbs}> {currentPath} </Text>
 
-            {items.length === 0 ? (
-                <EmptyContent openDialog={myDialog.current.createDialog} />
-            ) : (
-                <FilledContent items={items} onItemPress={onItemPress} openDialog={openDialog} />
-            )}
-            <AddNewDialog ref={myDialog} onDone={handleAddItem} />
-        </LinearGradient>
-    );
+        {items.length === 0 ? (
+            <EmptyContent openDialog={myDialog.current.createDialog} />
+        ) : (
+            <FilledContent items={items} onItemPress={onItemPress} openDialog={openDialog} />
+        )}
+        <AddNewDialog ref={myDialog} onDone={handleAddItem} />
+    </LinearGradient>);
 };
 
 export default HomeScreen;
@@ -113,13 +111,8 @@ const createStyles = theme => StyleSheet.create({
     noisyBackgroundFilter: {
         position: 'absolute',
         opacity: 0.4,
-        width: '125%',
-        height: '125%',
-        top: '-6%',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        resizeMode: 'stretch', 
-          
+        // transform:[{scale:0.333}, {translateX:-1080}, {translateY:-2412}],
+        transform:[{scale:0.4}, {translateX:-850}, {translateY:-1800}],
+        resizeMode: 'stretch',
     },
 });

@@ -6,13 +6,16 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const createStyles = (theme) => StyleSheet.create({
+    title: {
+        color: theme.colors.onPrimaryContainer,
+        marginTop: 25,
+        marginBottom: 10,
+        fontWeight: 'bold',
+    },
     buttonsContainer: {
-        // flex:1,
         flexDirection: 'column',
-        // justifyContent: 'stretch',
         marginBottom: 24,
         borderColor: 'red',
-        // borderWidth: 1,
         paddingHorizontal: 32,
     },
     button: {
@@ -110,7 +113,7 @@ export default AddNewDialog = forwardRef(function ({ onDone }, ref) {
                             hideDialog();
                         }}>Upload</Button>
                 </View>) : (<>
-                    <Dialog.Title style={{color:theme.colors.onTertiaryContainer, marginTop:25}}>{'Add new ' + (type ? type : '')}</Dialog.Title>
+                    <Dialog.Title style={styles.title}>{'Add new ' + (type ? type : '')}</Dialog.Title>
                     <Dialog.Content>
                         <TextInput
                             style={styles.input}
