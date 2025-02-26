@@ -80,10 +80,10 @@ export default function ({ items, onItemPress, openDialog }) {
             style={styles.itemContainer}
             onPress={() => onItemPress(item)}
             innerStyle={styles.touchableContainer}
-            iconComponent={<IconButton icon="play" iconColor={theme.colors.onBackground} size={30}/>}>
+            iconComponent={<IconButton icon="play" iconColor={theme.colors.primary} size={30}/>}>
 
             <IconButton
-                icon={item.type === ItemType.NOTEBOOK ? 'notebook-outline' : 'folder-outline'}
+                icon={item.type === ItemType.NOTEBOOK ? 'note-text' : 'folder-open'}
                 iconColor={
                     item.type === ItemType.NOTEBOOK
                         ? theme.colors.primaryContainer
@@ -108,7 +108,6 @@ export default function ({ items, onItemPress, openDialog }) {
             <FAB
                 style={styles.fab}
                 icon="plus"
-                label="Add"
                 onPress={() => openDialog(null)}
             />
         </View>
@@ -127,8 +126,6 @@ export const createStyles = (theme) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
-        // padding: 8,
-        // paddingRight: 16,
         borderWidth: 1,
         borderColor: theme.colors.onPrimary,
         backgroundColor: tinycolor(theme.colors.onPrimary).setAlpha(0.3).toString()
@@ -137,16 +134,10 @@ export const createStyles = (theme) => StyleSheet.create({
         flex:1,
         flexDirection: 'row',
         alignItems: 'center',
-
-        // borderWidth: 1,
-        // borderColor: 'white',
-        
         padding: 8,
-        // borderRadius: 15,
-        // overflow: 'hidden',
     },
     itemText: {
-        color: theme.colors.onBackground,
+        color: theme.colors.primary,
         fontSize: 14,
         flex: 1,
     },

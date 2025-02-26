@@ -39,7 +39,8 @@ DefaultTheme.colors = {
     surface:            'rgb(29, 29, 29)',
     surfaceVariant:     'rgb(45, 44, 46)',
     onTertiary:         'rgb(148, 99, 0)',
-    tertiaryContainer:  'rgb(235, 157, 2)',
+    tertiaryContainer:  'rgb(255, 169, 47)',
+    onTertiaryContainer:'rgb(224, 210, 184)',
 }
 
 
