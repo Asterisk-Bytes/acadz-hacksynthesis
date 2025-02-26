@@ -55,7 +55,7 @@ export default function App() {
                 <Stack.Navigator initialRouteName="Welcome" screenOptions={{
                     presentation: 'modal',
                     headerStyle: {
-                        backgroundColor: DefaultTheme.colors.primaryContainer,
+                        backgroundColor: 'black',//DefaultTheme.colors.primaryContainer,
                         elevation: 0,
                     },
                     headerTintColor: DefaultTheme.colors.onPrimaryContainer, // Text color for the header

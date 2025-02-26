@@ -1,4 +1,4 @@
-import { BackHandler, StyleSheet, Text, View} from "react-native";
+import { BackHandler, Image, StyleSheet, Text, View} from "react-native";
 import React, { useEffect, useRef, useState } from 'react';
 import { IconButton, useTheme } from "react-native-paper";
 import AddNewDialog from "../components/AddNewDialog";
@@ -12,6 +12,11 @@ import {
   getGroupPath, 
   getNotebookPath 
 } from '../utils/storageUtils';
+import LinearGradient from "react-native-linear-gradient";
+import { Images } from "../constants";
+
+// const COLOR_0_bgGradient = 'rgb(71, 10, 125)';
+const COLOR_0_bgGradient = 'rgb(119, 17, 209)';
 
 const HomeScreen = ({ navigation }) => {
     const theme = useTheme();
@@ -65,7 +70,17 @@ const HomeScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
+            <LinearGradient
+                colors={[COLOR_0_bgGradient, 'black']}
+                start={{x:0.5, y:0.0}}
+                end={{x:0.5, y:0.5}}
+                style={styles.container}
+            >
+                <Image
+                    style={styles.noisyBackgroundFilter}
+                    source={Images.noisyBackground}
+                    resizeMode="contain"
+                />
             <Text style={styles.breadcrumbs}> {currentPath} </Text>
 
             {items.length === 0 ? (
@@ -74,7 +89,7 @@ const HomeScreen = ({ navigation }) => {
                 <FilledContent items={items} onItemPress={onItemPress} openDialog={openDialog} />
             )}
             <AddNewDialog ref={myDialog} onDone={handleAddItem} />
-        </View>
+        </LinearGradient>
     );
 };
 
@@ -92,6 +107,19 @@ const createStyles = theme => StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderBottomWidth: 1,
-        borderColor: theme.colors.onPrimary,
-    }
+        borderColor: theme.colors.surface,
+    },
+    
+    noisyBackgroundFilter: {
+        position: 'absolute',
+        opacity: 0.4,
+        width: '125%',
+        height: '125%',
+        top: '-6%',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        resizeMode: 'stretch', 
+          
+    },
 });

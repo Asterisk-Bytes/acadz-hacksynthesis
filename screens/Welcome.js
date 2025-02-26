@@ -5,6 +5,7 @@ import { useTheme, Button, Text } from "react-native-paper";
 import LinearGradient from "react-native-linear-gradient";
 import Constants from 'expo-constants';
 import { useFonts } from "expo-font";
+import { StatusBar } from "expo-status-bar";
 
 const app_info = `
 Version: 0.2.1a (alpha)
@@ -43,7 +44,8 @@ export default function WelcomeScreen({ navigation }) {
     }, []);
     return (
         <LinearGradient
-            colors={[COLOR_0_bgGradient, 'black','black']}
+            colors={[COLOR_0_bgGradient, 'black']}
+            end={{x:0.5, y:0.5}}
             style={styles.container}
         >
             <Image
@@ -104,6 +106,7 @@ export default function WelcomeScreen({ navigation }) {
                 </LinearGradient>
                 
             </View>
+            <StatusBar style="light" />
         </LinearGradient>
     );
 }
