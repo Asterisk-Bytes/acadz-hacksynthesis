@@ -96,13 +96,13 @@ const NotebookScreen = ({ navigation, route }) => {
                     iconColor={theme.colors.tertiaryContainer}
                     containerColor={theme.colors.background}
                 />
-                <IconButton
+                {/* <IconButton
                     icon="file-pdf-box"
                     size={42}
                     onPress={() => navigation.navigate("UploadDocument")}
                     iconColor={theme.colors.tertiaryContainer}
                     containerColor={theme.colors.background}
-                />
+                /> */}
             </View>
 
             <View style={styles.otherContainer}>
