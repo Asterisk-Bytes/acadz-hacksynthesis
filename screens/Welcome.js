@@ -24,13 +24,14 @@ Any transcript/summary/flashcards etc, you add/generate are NOT saved.
 We are sorry for the inconvenience!
 `.trim();
 
-const COLOR_5_text1      = 'rgb(214, 192, 255)';
+const COLOR_5_text1      = 'rgb(210, 210, 210)';
 const COLOR_6_text2      = 'rgb(187, 157, 241)';
-const COLOR_4_btnText    = 'rgb(159, 104, 228)';
-const COLOR_1_extraBtn   = 'rgb(119, 17, 209)';
-const COLOR_0_bgGradient = 'rgb(119, 17, 209)';
-const COLOR_2_btnGradA   = 'rgb(71, 10, 125)';  // (1-noiseOpacity)*Color0 | prev: 'rgb(52, 10, 89)';
-const COLOR_3_btnGradB   = 'rgb(28, 4, 50)';    // 0.4*Color2              | prev: 'rgb(27, 0, 43)';
+const COLOR_4_btnText    = 'rgb(255, 255, 255)';
+const COLOR_1_extraBtn   = 'rgb(88, 88, 88)';
+const COLOR_0_bgGradient = 'rgb(169, 48, 48)';
+const COLOR_2_btnGradA   = 'rgb(52, 52, 52)';  // (1-noiseOpacity)*Color0 | prev: 'rgb(52, 10, 89)';
+const COLOR_3_btnGradB   = 'rgb(79, 79, 79)';    // 0.4*Color2              | prev: 'rgb(27, 0, 43)';
+const BACKGROUND_COLOUR = 'rgb(83, 88, 123)'
 
 export default function WelcomeScreen({ navigation }) {
     const theme = useTheme();
@@ -49,58 +50,47 @@ export default function WelcomeScreen({ navigation }) {
         });
     }, []);
     return (
-        <LinearGradient
-            colors={[COLOR_0_bgGradient, 'black']}
-            end={{x:0.5, y:0.5}}
-            style={styles.container}
-        >
+        <>
+        <View style={[styles.container, styles.backgroundcontainer]}>
             <Image
+                style={styles.wordcloud}
+                source={Images.wordcloud}
+                resizeMode="stretch"
+            />
+            <Image
+      style={styles.wordcloud}
+      source={Images.wordcloud}
+      resizeMode="cover"
+    />
+    <Image
                 style={styles.noisyBackgroundFilter}
                 source={Images.noisyBackground}
                 resizeMode="contain"
             />
-            <Image
-                style={styles.image}
-                source={Images.landingPageImage}
-                resizeMode="contain"
-            />
+    <LinearGradient
+      colors={['transparent', 'rgba(0,0,0,0.9)']}
+      style={styles.gradientVignette}
+    />
+            
             <View style={styles.bottomContainer}>
+
+            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                <Image
+                    style={styles.logo}
+                    source={Images.logo}
+                    resizeMode="stretch"
+                />
+                    <ShimmerText
+                        style={{ height: 50, width: 180 }}
+                        text="Synapse"
+                        textStyle={styles.titleText}
+                        textColor={COLOR_5_text1}
+                        shimmerColor={COLOR_4_btnText}
+                        shimmerDuration={3000}/>
+            </View>
+
                 
-                <ShimmerText
-                    style={{height:70}}
-                    text="acadz"
-                    textStyle={styles.titleText}
-                    textColor={COLOR_5_text1}
-                    shimmerColor={COLOR_4_btnText}
-                    shimmerDuration={3000}/>
 
-                <Text style={styles.subtitleText}>
-                    Your <Text style={[styles.subtitleText, { fontWeight: 'bold', fontStyle: 'italic' }]}>
-                        AI-powered study companion
-                    </Text> - Let me handle the mess, while you focus on <Text style={[styles.subtitleText, { fontWeight: 'bold' }]}>learning</Text>!
-                </Text>
-                <Text style={styles.featuresText}>
-                    ✔ Record lectures seamlessly{'\n'}
-                    ✔ Get instant transcripts & summaries{'\n'}
-                    ✔ AI-powered flashcards for revision{'\n'}
-                    ✔ Discover relevant YouTube videos
-                </Text>
-                <View style={styles.extraButtonContainer}>
-                    
-                    <Button
-                        mode="text"
-                        textColor={COLOR_1_extraBtn}
-                        labelStyle={{textDecorationLine: 'underline'}}
-                        onPress={() => alertDialog.current.createDialog('Disclaimer', disclaimer)}>
-                        Disclaimer</Button>
-
-                    <Button
-                        mode="text"
-                        textColor={COLOR_1_extraBtn}
-                        labelStyle={{textDecorationLine: 'underline'}}
-                        onPress={() => alertDialog.current.createDialog('App Info', app_info)}>
-                        App Info</Button>
-                </View>
 
                 <LinearGradient
                     start={{x: 0, y: 0.5}} end={{x: 0.9, y: 0.5}}
@@ -117,26 +107,66 @@ export default function WelcomeScreen({ navigation }) {
                         Continue to Dashboard
                     </Button>
                 </LinearGradient>
+                <View style={styles.extraButtonContainer}>
+                    
+                    <Button
+                        mode="text"
+                        textColor={COLOR_1_extraBtn}
+                        labelStyle={{textDecorationLine: 'underline'}}
+                        onPress={() => alertDialog.current.createDialog('Disclaimer', disclaimer)}>
+                        Disclaimer</Button>
+
+                    <Button
+                        mode="text"
+                        textColor={COLOR_1_extraBtn}
+                        labelStyle={{textDecorationLine: 'underline'}}
+                        onPress={() => alertDialog.current.createDialog('App Info', app_info)}>
+                        App Info</Button>
+                </View>
                 
             </View>
             <AlertDialog ref={alertDialog}/>
             <StatusBar style="light" />
-        </LinearGradient>
+            </View>
+        </>
     );
 }
 
 const createStyles = theme => StyleSheet.create({
+    gradientVignette: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '80%', // Adjust the height of the gradient vignette as needed
+      },
+    logo: {
+        height: 30,
+        width: 30,
+    },
     container: {
         flex: 1,
         alignItems: 'center',
         paddingTop: Constants.statusBarHeight + 24,
         paddingBottom: 24,
     },
-
+    backgroundcontainer: {
+        position: 'absolute',
+        backgroundColor: BACKGROUND_COLOUR,
+        height: '100%',
+        width: '100%',
+    },
     image: {
         borderWidth: 1,
         flexShrink: 1,
         maxWidth: '65%',
+    },
+
+    wordcloud: {
+        position: 'absolute',
+        resizeMode: 'stretch',
+        top: -200,
+        left: -200,
     },
     noisyBackgroundFilter: {
         position: 'absolute',
@@ -147,15 +177,21 @@ const createStyles = theme => StyleSheet.create({
     },
 
     bottomContainer: {
-        height: '67%',
+        height: '100%',
+        width: '100%',
         paddingHorizontal: 24,
         alignSelf:'stretch',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        position: 'absolute',
+        bottom: "-55%",
     },
     
     titleText: {
         fontWeight: 'bold',
         fontFamily: 'Poppins',
-        fontSize: 50,
+        fontSize: 30,
     },
 
     subtitleText: {
@@ -176,7 +212,7 @@ const createStyles = theme => StyleSheet.create({
     },
 
     button: {
-        borderRadius: 100,
+        borderRadius: 20,
         alignSelf: 'stretch',
     }
 });
