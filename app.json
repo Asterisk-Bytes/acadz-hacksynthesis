@@ -1,8 +1,8 @@
 {
     "expo": {
-        "name": "AcadZ",
+        "name": "Synapse",
         "slug": "client",
-        "version": "0.2.1a",
+        "version": "1.0.0",
         "scheme": "acadz",
         "orientation": "portrait",
         "icon": "./assets/icon.png",
@@ -20,7 +20,7 @@
                 "foregroundImage": "./assets/adaptive-icon.png",
                 "backgroundColor": "#111111"
             },
-            "package": "com.asterisk.acadz"
+            "package": "com.asterisk.x.synapse"
         },
         "web": {
             "favicon": "./assets/favicon.png"
@@ -29,8 +29,8 @@
             [
                 "expo-speech-recognition",
                 {
-                    "microphonePermission": "Allow AcadZ to use the microphone.",
-                    "speechRecognitionPermission": "Allow AcadZ to use speech recognition.",
+                    "microphonePermission": "Allow Synapse to use the microphone.",
+                    "speechRecognitionPermission": "Allow Synapse to use speech recognition.",
                     "androidSpeechServicePackages": [
                         "com.google.android.googlequicksearchbox"
                     ]
